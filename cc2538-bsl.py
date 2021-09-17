@@ -275,6 +275,20 @@ class CommandInterface(object):
         set_bootloader_pin(0)
         time.sleep(0.1)
 
+    def invoke_bootloader_3(self):
+        mdebug(5, "Invoking bootloader by method 3 (NodeMCU-like, Egony way)")
+        set_bootloader_pin = self.sp.setRTS
+        set_reset_pin = self.sp.setDTR
+
+        set_bootloader_pin(1)
+        set_reset_pin(0)
+        set_reset_pin(1)
+        set_reset_pin(0)
+        time.sleep(0.1)
+        set_reset_pin(1)
+        set_bootloader_pin(0)
+        time.sleep(0.1)
+
     def close(self):
         self.sp.close()
 
@@ -1070,6 +1084,7 @@ def usage():
                                      0 - skip bootloader invoking;
                                      1 - default method;
                                      2 - NodeMCU-like method.
+                                     3 - NodeMCU-like method, Egony way.
     --version                    Print script version
 
 Examples:
@@ -1217,6 +1232,8 @@ if __name__ == "__main__":
                                     conf['bootloader_invert_lines'])
         elif conf['invoke-bootloader'] == 2:
             cmd.invoke_bootloader_2(conf['bootloader_invert_lines'])
+        elif conf['invoke-bootloader'] == 3:
+            cmd.invoke_bootloader_3()
         else:
             raise Exception('Unknown --invoke-bootloader argument: %d' % conf['invoke-bootloader'])
         mdebug(5, "Opening port %(port)s, baud %(baud)d"
